@@ -525,7 +525,7 @@ Disassembly of section .text:
  8048db1:	83 c4 2c             	add    $0x2c,%esp
  8048db4:	c3                   	ret    
 
-08048db5 <phase_6>:
+08048db5 <phase_6>:															#算是看明白了，这是一个链表从小到大排序
  8048db5:	56                   	push   %esi
  8048db6:	53                   	push   %ebx
  8048db7:	83 ec 44             	sub    $0x44,%esp
@@ -533,43 +533,43 @@ Disassembly of section .text:
  8048dbe:	89 44 24 04          	mov    %eax,0x4(%esp)
  8048dc2:	8b 44 24 50          	mov    0x50(%esp),%eax
  8048dc6:	89 04 24             	mov    %eax,(%esp)
- 8048dc9:	e8 5d 04 00 00       	call   804922b <read_six_numbers>		#典中典之读6个数
- 8048dce:	be 00 00 00 00       	mov    $0x0,%esi
- 8048dd3:	8b 44 b4 10          	mov    0x10(%esp,%esi,4),%eax
- 8048dd7:	83 e8 01             	sub    $0x1,%eax
- 8048dda:	83 f8 05             	cmp    $0x5,%eax
- 8048ddd:	76 05                	jbe    8048de4 <phase_6+0x2f>			#小于等于不炸
+ 8048dc9:	e8 5d 04 00 00       	call   804922b <read_six_numbers>		#典中典之读6个数，
+ 8048dce:	be 00 00 00 00       	mov    $0x0,%esi						#参数1：0x10(%esp) 参数2：0x14(%esp)
+ 8048dd3:	8b 44 b4 10          	mov    0x10(%esp,%esi,4),%eax			#参数3：0x18(%esp) 参数4：0x1c(%esp)
+ 8048dd7:	83 e8 01             	sub    $0x1,%eax						#参数5：0x20(%esp) 参数6：0x24(%esp)
+ 8048dda:	83 f8 05             	cmp    $0x5,%eax						#%eax=参数1 - 1，
+ 8048ddd:	76 05                	jbe    8048de4 <phase_6+0x2f>			#%eax小于等于5不炸，参数1<=6。循环着发现所有参数都要满足这个约束条件
  8048ddf:	e8 12 03 00 00       	call   80490f6 <explode_bomb>
  8048de4:	83 c6 01             	add    $0x1,%esi
  8048de7:	83 fe 06             	cmp    $0x6,%esi
- 8048dea:	74 33                	je     8048e1f <phase_6+0x6a>			#
+ 8048dea:	74 33                	je     8048e1f <phase_6+0x6a>			#%esi等于6跳出循环
  8048dec:	89 f3                	mov    %esi,%ebx
- 8048dee:	8b 44 9c 10          	mov    0x10(%esp,%ebx,4),%eax
- 8048df2:	39 44 b4 0c          	cmp    %eax,0xc(%esp,%esi,4)
- 8048df6:	75 05                	jne    8048dfd <phase_6+0x48>
+ 8048dee:	8b 44 9c 10          	mov    0x10(%esp,%ebx,4),%eax			#%eax=参数[%esi+1]
+ 8048df2:	39 44 b4 0c          	cmp    %eax,0xc(%esp,%esi,4)			#参数[%esi+2]
+ 8048df6:	75 05                	jne    8048dfd <phase_6+0x48>			#需要后一个参数不等于前一个参数
  8048df8:	e8 f9 02 00 00       	call   80490f6 <explode_bomb>
  8048dfd:	83 c3 01             	add    $0x1,%ebx
- 8048e00:	83 fb 05             	cmp    $0x5,%ebx
- 8048e03:	7e e9                	jle    8048dee <phase_6+0x39>
+ 8048e00:	83 fb 05             	cmp    $0x5,%ebx						#这是一个循环，要求所有的数都满足
+ 8048e03:	7e e9                	jle    8048dee <phase_6+0x39>			#“后一个参数不等于前一个参数”这个约束条件
  8048e05:	eb cc                	jmp    8048dd3 <phase_6+0x1e>
- 8048e07:	8b 52 08             	mov    0x8(%edx),%edx
- 8048e0a:	83 c0 01             	add    $0x1,%eax
- 8048e0d:	39 c8                	cmp    %ecx,%eax
- 8048e0f:	75 f6                	jne    8048e07 <phase_6+0x52>
- 8048e11:	89 54 b4 28          	mov    %edx,0x28(%esp,%esi,4)
- 8048e15:	83 c3 01             	add    $0x1,%ebx
- 8048e18:	83 fb 06             	cmp    $0x6,%ebx
- 8048e1b:	75 07                	jne    8048e24 <phase_6+0x6f>
+ 8048e07:	8b 52 08             	mov    0x8(%edx),%edx					#%ecx>1多执行这段循环，%edx数组第三个数移到%edx
+ 8048e0a:	83 c0 01             	add    $0x1,%eax						#%eax+1
+ 8048e0d:	39 c8                	cmp    %ecx,%eax						#
+ 8048e0f:	75 f6                	jne    8048e07 <phase_6+0x52>			#循环到%ecx==%eax
+ 8048e11:	89 54 b4 28          	mov    %edx,0x28(%esp,%esi,4)			#
+ 8048e15:	83 c3 01             	add    $0x1,%ebx						#%ebx+1
+ 8048e18:	83 fb 06             	cmp    $0x6,%ebx						#
+ 8048e1b:	75 07                	jne    8048e24 <phase_6+0x6f>			#%ebx不等于6继续循环
  8048e1d:	eb 1c                	jmp    8048e3b <phase_6+0x86>
- 8048e1f:	bb 00 00 00 00       	mov    $0x0,%ebx
- 8048e24:	89 de                	mov    %ebx,%esi
- 8048e26:	8b 4c 9c 10          	mov    0x10(%esp,%ebx,4),%ecx
+ 8048e1f:	bb 00 00 00 00       	mov    $0x0,%ebx						#跳到这
+ 8048e24:	89 de                	mov    %ebx,%esi						#%ebx和%esi清零
+ 8048e26:	8b 4c 9c 10          	mov    0x10(%esp,%ebx,4),%ecx			#前有参数数组 %ecx=参数[%ebx+1]
  8048e2a:	b8 01 00 00 00       	mov    $0x1,%eax
- 8048e2f:	ba 3c c1 04 08       	mov    $0x804c13c,%edx
- 8048e34:	83 f9 01             	cmp    $0x1,%ecx
- 8048e37:	7f ce                	jg     8048e07 <phase_6+0x52>
+ 8048e2f:	ba 3c c1 04 08       	mov    $0x804c13c,%edx					#这是个数组
+ 8048e34:	83 f9 01             	cmp    $0x1,%ecx						#%ecx>1多执行一段小循环
+ 8048e37:	7f ce                	jg     8048e07 <phase_6+0x52>			#
  8048e39:	eb d6                	jmp    8048e11 <phase_6+0x5c>
- 8048e3b:	8b 5c 24 28          	mov    0x28(%esp),%ebx
+ 8048e3b:	8b 5c 24 28          	mov    0x28(%esp),%ebx					#此时%ebx=6跳到这，
  8048e3f:	8b 44 24 2c          	mov    0x2c(%esp),%eax
  8048e43:	89 43 08             	mov    %eax,0x8(%ebx)
  8048e46:	8b 54 24 30          	mov    0x30(%esp),%edx
@@ -584,12 +584,12 @@ Disassembly of section .text:
  8048e69:	be 05 00 00 00       	mov    $0x5,%esi
  8048e6e:	8b 43 08             	mov    0x8(%ebx),%eax
  8048e71:	8b 10                	mov    (%eax),%edx
- 8048e73:	39 13                	cmp    %edx,(%ebx)
- 8048e75:	7e 05                	jle    8048e7c <phase_6+0xc7>
+ 8048e73:	39 13                	cmp    %edx,(%ebx)						#
+ 8048e75:	7e 05                	jle    8048e7c <phase_6+0xc7>			#(%ebx)要小于等于%edx，否则爆炸
  8048e77:	e8 7a 02 00 00       	call   80490f6 <explode_bomb>
  8048e7c:	8b 5b 08             	mov    0x8(%ebx),%ebx
- 8048e7f:	83 ee 01             	sub    $0x1,%esi
- 8048e82:	75 ea                	jne    8048e6e <phase_6+0xb9>
+ 8048e7f:	83 ee 01             	sub    $0x1,%esi						#
+ 8048e82:	75 ea                	jne    8048e6e <phase_6+0xb9>			#%esi不等于1继续循环
  8048e84:	83 c4 44             	add    $0x44,%esp
  8048e87:	5b                   	pop    %ebx
  8048e88:	5e                   	pop    %esi
