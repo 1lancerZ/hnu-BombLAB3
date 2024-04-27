@@ -116,3 +116,27 @@ struct node {
  8048e0f:	8b 00                	mov    (%eax),%eax						#%eax=*(%eax)
  8048e11:	39 44 24 08          	cmp    %eax,0x8(%esp)					#*(%eax)和参数2比较
  8048e15:	74 05                	je     8048e1c <phase_6+0x67>			#相等爆炸
+
+secret_phase解法：
+首先是找到隐藏的入口
+发现在phase_defused函数里有一个secret_phase函数
+顺着找到0x804a3f2中的字符串，这就是打开隐藏门的钥匙
+怎么打开呢？
+发现phase_4输入的参数存在0x804c4d0中
+如果在phase_4原本的输入后加上钥匙字符串，就能打开隐藏门
+在secret_phase中有fun7
+fun7是依托一个二叉树结构的递归函数：
+int fun7(Node *root, int val){
+    if(root == NULL)
+        return -1;
+    if(root->value == val)
+         return 0;       
+    else if(root->value > val)
+    	return 2*fun7(root->left,val);
+    else if(root->value < val)
+        return 2*fun7(root->right,val)+1;
+}
+二叉树结构：
+![fun7二叉树](fun7二叉树.jpg "fun7二叉树")
+只要让返回值=3就能解决secret_phase
+这个值就是0x6b 107

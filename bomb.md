@@ -386,7 +386,7 @@ Disassembly of section .text:
  8048bcb:	89 44 24 0c          	mov    %eax,0xc(%esp)					#参数2 0x1c(%esp)
  8048bcf:	8d 44 24 18          	lea    0x18(%esp),%eax
  8048bd3:	89 44 24 08          	mov    %eax,0x8(%esp)					#参数1 0x18(%esp)
- 8048bd7:	c7 44 24 04 e3 a3 04 	movl   $0x804a3e3,0x4(%esp)				#"%d %d"
+ 8048bd7:	c7 44 24 04 e3 a3 04 	movl   $0x804a3e3,0x4(%esp)				#"%d %d" 不是隐藏
  8048bde:	08 
  8048bdf:	8b 44 24 30          	mov    0x30(%esp),%eax
  8048be3:	89 04 24             	mov    %eax,(%esp)
@@ -467,7 +467,7 @@ Disassembly of section .text:
  8048ce6:	89 44 24 0c          	mov    %eax,0xc(%esp)					#参数2 0x18(%esp)
  8048cea:	8d 44 24 1c          	lea    0x1c(%esp),%eax
  8048cee:	89 44 24 08          	mov    %eax,0x8(%esp)					#参数1 0x1c(%esp)
- 8048cf2:	c7 44 24 04 e3 a3 04 	movl   $0x804a3e3,0x4(%esp)
+ 8048cf2:	c7 44 24 04 e3 a3 04 	movl   $0x804a3e3,0x4(%esp)				#"%d %d %s" 隐藏入口
  8048cf9:	08 
  8048cfa:	8b 44 24 30          	mov    0x30(%esp),%eax
  8048cfe:	89 04 24             	mov    %eax,(%esp)
@@ -496,7 +496,7 @@ Disassembly of section .text:
  8048d48:	89 44 24 0c          	mov    %eax,0xc(%esp)
  8048d4c:	8d 44 24 18          	lea    0x18(%esp),%eax					#参数1: 0x18(%esp)
  8048d50:	89 44 24 08          	mov    %eax,0x8(%esp)
- 8048d54:	c7 44 24 04 e3 a3 04 	movl   $0x804a3e3,0x4(%esp)
+ 8048d54:	c7 44 24 04 e3 a3 04 	movl   $0x804a3e3,0x4(%esp)				#"%d %d" 假隐藏
  8048d5b:	08 
  8048d5c:	8b 44 24 30          	mov    0x30(%esp),%eax
  8048d60:	89 04 24             	mov    %eax,(%esp)
@@ -595,37 +595,37 @@ Disassembly of section .text:
  8048e88:	5e                   	pop    %esi
  8048e89:	c3                   	ret    
 
-08048e8a <fun7>:
+08048e8a <fun7>:															#这是一个巨大的二叉树
  8048e8a:	53                   	push   %ebx
  8048e8b:	83 ec 18             	sub    $0x18,%esp
- 8048e8e:	8b 54 24 20          	mov    0x20(%esp),%edx
- 8048e92:	8b 4c 24 24          	mov    0x24(%esp),%ecx
- 8048e96:	85 d2                	test   %edx,%edx
- 8048e98:	74 37                	je     8048ed1 <fun7+0x47>
+ 8048e8e:	8b 54 24 20          	mov    0x20(%esp),%edx					#%edx是子节点指针
+ 8048e92:	8b 4c 24 24          	mov    0x24(%esp),%ecx					#%ecx就是输入的参数
+ 8048e96:	85 d2                	test   %edx,%edx						#
+ 8048e98:	74 37                	je     8048ed1 <fun7+0x47>				#子节点指针等于0 return
  8048e9a:	8b 1a                	mov    (%edx),%ebx
- 8048e9c:	39 cb                	cmp    %ecx,%ebx
- 8048e9e:	7e 13                	jle    8048eb3 <fun7+0x29>
+ 8048e9c:	39 cb                	cmp    %ecx,%ebx						#%ebx是root
+ 8048e9e:	7e 13                	jle    8048eb3 <fun7+0x29>				#参数>=root跳转
  8048ea0:	89 4c 24 04          	mov    %ecx,0x4(%esp)
  8048ea4:	8b 42 04             	mov    0x4(%edx),%eax
  8048ea7:	89 04 24             	mov    %eax,(%esp)
- 8048eaa:	e8 db ff ff ff       	call   8048e8a <fun7>
- 8048eaf:	01 c0                	add    %eax,%eax
+ 8048eaa:	e8 db ff ff ff       	call   8048e8a <fun7>					#递归
+ 8048eaf:	01 c0                	add    %eax,%eax						#%eax*2
  8048eb1:	eb 23                	jmp    8048ed6 <fun7+0x4c>
- 8048eb3:	b8 00 00 00 00       	mov    $0x0,%eax
- 8048eb8:	39 cb                	cmp    %ecx,%ebx
- 8048eba:	74 1a                	je     8048ed6 <fun7+0x4c>
- 8048ebc:	89 4c 24 04          	mov    %ecx,0x4(%esp)
+ 8048eb3:	b8 00 00 00 00       	mov    $0x0,%eax						#%eax置零
+ 8048eb8:	39 cb                	cmp    %ecx,%ebx						#
+ 8048eba:	74 1a                	je     8048ed6 <fun7+0x4c>				#参数==root return
+ 8048ebc:	89 4c 24 04          	mov    %ecx,0x4(%esp)					#参数>root eax*2+1
  8048ec0:	8b 42 08             	mov    0x8(%edx),%eax
  8048ec3:	89 04 24             	mov    %eax,(%esp)
  8048ec6:	e8 bf ff ff ff       	call   8048e8a <fun7>
- 8048ecb:	8d 44 00 01          	lea    0x1(%eax,%eax,1),%eax
+ 8048ecb:	8d 44 00 01          	lea    0x1(%eax,%eax,1),%eax			#eax*2+1
  8048ecf:	eb 05                	jmp    8048ed6 <fun7+0x4c>
- 8048ed1:	b8 ff ff ff ff       	mov    $0xffffffff,%eax
- 8048ed6:	83 c4 18             	add    $0x18,%esp
+ 8048ed1:	b8 ff ff ff ff       	mov    $0xffffffff,%eax					#子节点指针为空返回-1
+ 8048ed6:	83 c4 18             	add    $0x18,%esp						#参数==root return 0
  8048ed9:	5b                   	pop    %ebx
  8048eda:	c3                   	ret    
 
-08048edb <secret_phase>:
+08048edb <secret_phase>:													#宫崎英高儿子上幼儿园要打开隐藏墙壁
  8048edb:	53                   	push   %ebx
  8048edc:	83 ec 18             	sub    $0x18,%esp
  8048edf:	e8 39 02 00 00       	call   804911d <read_line>
@@ -637,14 +637,14 @@ Disassembly of section .text:
  8048ef7:	e8 e4 f9 ff ff       	call   80488e0 <strtol@plt>
  8048efc:	89 c3                	mov    %eax,%ebx
  8048efe:	8d 40 ff             	lea    -0x1(%eax),%eax
- 8048f01:	3d e8 03 00 00       	cmp    $0x3e8,%eax
- 8048f06:	76 05                	jbe    8048f0d <secret_phase+0x32>
+ 8048f01:	3d e8 03 00 00       	cmp    $0x3e8,%eax						#
+ 8048f06:	76 05                	jbe    8048f0d <secret_phase+0x32>		#参数1小于0x3e8
  8048f08:	e8 e9 01 00 00       	call   80490f6 <explode_bomb>
  8048f0d:	89 5c 24 04          	mov    %ebx,0x4(%esp)
  8048f11:	c7 04 24 88 c0 04 08 	movl   $0x804c088,(%esp)
  8048f18:	e8 6d ff ff ff       	call   8048e8a <fun7>
- 8048f1d:	83 f8 03             	cmp    $0x3,%eax
- 8048f20:	74 05                	je     8048f27 <secret_phase+0x4c>
+ 8048f1d:	83 f8 03             	cmp    $0x3,%eax						#
+ 8048f20:	74 05                	je     8048f27 <secret_phase+0x4c>		#%eax等于3，不然就爆
  8048f22:	e8 cf 01 00 00       	call   80490f6 <explode_bomb>
  8048f27:	c7 04 24 f0 a1 04 08 	movl   $0x804a1f0,(%esp)
  8048f2e:	e8 cd f8 ff ff       	call   8048800 <puts@plt>
@@ -899,12 +899,12 @@ Disassembly of section .text:
  8049277:	83 c4 2c             	add    $0x2c,%esp
  804927a:	c3                   	ret    
 
-0804927b <phase_defused>:
+0804927b <phase_defused>:														#前有隐藏
  804927b:	81 ec 8c 00 00 00    	sub    $0x8c,%esp
  8049281:	65 a1 14 00 00 00    	mov    %gs:0x14,%eax
  8049287:	89 44 24 7c          	mov    %eax,0x7c(%esp)
  804928b:	31 c0                	xor    %eax,%eax
- 804928d:	83 3d cc c3 04 08 06 	cmpl   $0x6,0x804c3cc
+ 804928d:	83 3d cc c3 04 08 06 	cmpl   $0x6,0x804c3cc						#存的过关数量
  8049294:	75 72                	jne    8049308 <phase_defused+0x8d>
  8049296:	8d 44 24 2c          	lea    0x2c(%esp),%eax
  804929a:	89 44 24 10          	mov    %eax,0x10(%esp)
@@ -912,24 +912,24 @@ Disassembly of section .text:
  80492a2:	89 44 24 0c          	mov    %eax,0xc(%esp)
  80492a6:	8d 44 24 24          	lea    0x24(%esp),%eax
  80492aa:	89 44 24 08          	mov    %eax,0x8(%esp)
- 80492ae:	c7 44 24 04 e9 a3 04 	movl   $0x804a3e9,0x4(%esp)
+ 80492ae:	c7 44 24 04 e9 a3 04 	movl   $0x804a3e9,0x4(%esp)					#"%d %d %s"
  80492b5:	08 
- 80492b6:	c7 04 24 d0 c4 04 08 	movl   $0x804c4d0,(%esp)
+ 80492b6:	c7 04 24 d0 c4 04 08 	movl   $0x804c4d0,(%esp)					#这里存的正是phase_4输入的内容，隐藏门从phase_4进
  80492bd:	e8 ae f5 ff ff       	call   8048870 <__isoc99_sscanf@plt>
  80492c2:	83 f8 03             	cmp    $0x3,%eax
  80492c5:	75 35                	jne    80492fc <phase_defused+0x81>
- 80492c7:	c7 44 24 04 f2 a3 04 	movl   $0x804a3f2,0x4(%esp)
+ 80492c7:	c7 44 24 04 f2 a3 04 	movl   $0x804a3f2,0x4(%esp)				#需要判断是否相等的字符串"Lancer"
  80492ce:	08 
  80492cf:	8d 44 24 2c          	lea    0x2c(%esp),%eax
  80492d3:	89 04 24             	mov    %eax,(%esp)
  80492d6:	e8 09 fd ff ff       	call   8048fe4 <strings_not_equal>
  80492db:	85 c0                	test   %eax,%eax
- 80492dd:	75 1d                	jne    80492fc <phase_defused+0x81>
+ 80492dd:	75 1d                	jne    80492fc <phase_defused+0x81>		#
  80492df:	c7 04 24 b8 a2 04 08 	movl   $0x804a2b8,(%esp)
  80492e6:	e8 15 f5 ff ff       	call   8048800 <puts@plt>
  80492eb:	c7 04 24 e0 a2 04 08 	movl   $0x804a2e0,(%esp)
- 80492f2:	e8 09 f5 ff ff       	call   8048800 <puts@plt>
- 80492f7:	e8 df fb ff ff       	call   8048edb <secret_phase>
+ 80492f2:	e8 09 f5 ff ff       	call   8048800 <puts@plt>				
+ 80492f7:	e8 df fb ff ff       	call   8048edb <secret_phase>			#字符串匹配进隐藏门
  80492fc:	c7 04 24 18 a3 04 08 	movl   $0x804a318,(%esp)
  8049303:	e8 f8 f4 ff ff       	call   8048800 <puts@plt>
  8049308:	8b 44 24 7c          	mov    0x7c(%esp),%eax
